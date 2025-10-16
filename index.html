@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to HTML Converter</title>
+    <!-- Tailwind CSS Play CDN with Typography plugin -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {},
+            },
+            plugins: [
+                require('@tailwindcss/typography'),
+            ],
+        }
+    </script>
+    <!-- Marked.js for Markdown to HTML conversion -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- DOMPurify for sanitizing HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.6/dist/purify.min.js"></script>
+</head>
+<body class="font-sans bg-gray-100 text-gray-900">
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-indigo-700 mb-2">Markdown Viewer</h1>
+            <p class="text-lg text-gray-600">Rendering <code>input.md</code> to interactive HTML.</p>
+        </header>
+
+        <main class="bg-white shadow-lg rounded-lg p-6 sm:p-8 lg:p-10">
+            <div id="markdown-output" class="prose max-w-none prose-indigo">
+                <!-- Markdown content will be rendered here -->
+                <p class="text-center text-gray-500">Loading content...</p>
+            </div>
+        </main>
+
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>&copy; 2023 Markdown Viewer. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('input.md')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(markdownContent => {
+                    // Convert markdown to HTML
+                    const html = marked.parse(markdownContent);
+                    // Sanitize the HTML
+                    const cleanHtml = DOMPurify.sanitize(html);
+                    // Render into the div
+                    document.getElementById('markdown-output').innerHTML = cleanHtml;
+                })
+                .catch(error => {
+                    console.error('Error fetching or processing markdown:', error);
+                    document.getElementById('markdown-output').innerHTML = '<p class="text-red-500">Error loading content. Please ensure <code>input.md</code> is in the same directory.</p>';
+                });
+        });
+    </script>
+</body>
+</html>
